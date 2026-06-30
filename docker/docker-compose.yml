@@ -1,0 +1,98 @@
+version: "3.9"
+
+name: hd-platform
+
+services:
+
+  postgres:
+    image: postgres:16
+
+    container_name: hd-platform-postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${TZ}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+    networks:
+      - hd-platform-network
+
+  redis:
+    image: redis:8
+
+    container_name: hd-platform-redis
+
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - hd-platform-network
+
+  pgadmin:
+    image: dpage/pgadmin4:9
+
+    container_name: hd-platform-pgadmin
+
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+
+    ports:
+      - "${PGADMIN_PORT}:80"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+    networks:
+      - hd-platform-network
+
+networks:
+
+  hd-platform-network:
+    driver: bridge
+
+volumes:
+
+  postgres-data:
+
+  redis-data:
+
+  pgadmin-data:
