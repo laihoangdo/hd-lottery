@@ -68,4 +68,8 @@ public final class DisplayName implements Serializable {
         return value.hashCode();
     }
 
+    public static DisplayName of(String displayName) {
+        return new DisplayName(displayName);
+    }
+
 }

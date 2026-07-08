@@ -19,4 +19,8 @@ public interface TenantJpaRepository extends JpaRepository<TenantEntity, UUID> {
 
     boolean existsByDomainName(String domainName);
 
+    Optional<TenantEntity> findByCode(String code);
+
+    boolean existsByCode(String code);
+
 }

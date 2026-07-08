@@ -1,13 +1,17 @@
 package com.hdplatform.modules.tenant.adapter.out.persistence.adapter;
 
+import com.hdplatform.modules.tenant.adapter.out.persistence.entity.TenantEntity;
+import com.hdplatform.modules.tenant.adapter.out.persistence.mapper.TenantPersistenceMapper;
+import com.hdplatform.modules.tenant.adapter.out.persistence.repository.TenantJpaRepository;
+import com.hdplatform.modules.tenant.application.port.TenantRepository;
 import com.hdplatform.modules.tenant.domain.aggregate.Tenant;
-import com.hdplatform.modules.tenant.domain.repository.TenantRepository;
-import com.hdplatform.modules.tenant.domain.valueobject.DomainName;
-import com.hdplatform.modules.tenant.domain.valueobject.SiteKey;
-import com.hdplatform.modules.tenant.domain.valueobject.TenantId;
+import com.hdplatform.modules.tenant.domain.aggregate.TenantId;
+import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,41 +23,43 @@ import java.util.Optional;
  * Tenant Aggregate supports rehydration.
  */
 @Repository
+@RequiredArgsConstructor
 public class TenantPersistenceAdapter implements TenantRepository {
+
+
+    private final TenantJpaRepository repository;
+
+    private final TenantPersistenceMapper mapper;
 
     @Override
     public Tenant save(Tenant tenant) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        System.out.println("tenant"+ tenant);
+        TenantEntity entity =
+                mapper.toEntity(tenant);
+
+        return mapper.toAggregate(repository.save(entity));
     }
 
     @Override
     public Optional<Tenant> findById(TenantId id) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+
+        return repository.findById(id.getValue())
+                .map(mapper::toAggregate);
+
     }
 
     @Override
-    public Optional<Tenant> findBySiteKey(SiteKey siteKey) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public Optional<Tenant> findByCode(TenantCode code) {
+
+        return repository.findByCode(code.value())
+                .map(mapper::toAggregate);
+
     }
 
     @Override
-    public Optional<Tenant> findByDomainName(DomainName domainName) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
+    public boolean existsByCode(TenantCode code) {
 
-    @Override
-    public boolean existsBySiteKey(SiteKey siteKey) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
+        return repository.existsByCode(code.value());
 
-    @Override
-    public boolean existsByDomainName(DomainName domainName) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
-
-    @Override
-    public List<Tenant> findAll() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
 }

@@ -63,4 +63,8 @@ public final class Hotline implements Serializable {
         return value.hashCode();
     }
 
+    public static Hotline of(String hotline) {
+        return new Hotline(hotline);
+    }
+
 }

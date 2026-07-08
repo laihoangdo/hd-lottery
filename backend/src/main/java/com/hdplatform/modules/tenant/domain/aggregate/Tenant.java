@@ -1,14 +1,20 @@
 package com.hdplatform.modules.tenant.domain.aggregate;
 
+import com.hdplatform.modules.tenant.domain.event.TenantCreatedEvent;
+import com.hdplatform.modules.tenant.domain.rule.TenantCodeMustNotBeEmptyRule;
+import com.hdplatform.modules.tenant.domain.rule.TenantNameMustNotBeEmptyRule;
 import com.hdplatform.modules.tenant.domain.valueobject.DisplayName;
 import com.hdplatform.modules.tenant.domain.valueobject.DomainName;
 import com.hdplatform.modules.tenant.domain.valueobject.Hotline;
-import com.hdplatform.modules.tenant.domain.valueobject.Logo;
+import com.hdplatform.modules.tenant.domain.valueobject.LogoUrl;
 import com.hdplatform.modules.tenant.domain.valueobject.SiteKey;
-import com.hdplatform.modules.tenant.domain.valueobject.TenantId;
+import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
+import com.hdplatform.modules.tenant.domain.valueobject.TenantName;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantStatus;
+import com.hdplatform.shared.domain.AuditableEntity;
+import com.hdplatform.shared.domain.rule.BusinessRuleValidator;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -18,109 +24,74 @@ import java.util.Objects;
  * A Tenant represents one lottery dealer website in HD Platform.
  * </p>
  */
-public final class Tenant {
+public class Tenant extends AuditableEntity<TenantId>{
 
-    private final TenantId id;
+    // private final TenantId id;
 
-    private final OffsetDateTime createdAt;
+    // private final OffsetDateTime createdAt;
 
     private SiteKey siteKey;
 
     private DomainName domainName;
 
-    private String displayName;
+    private DisplayName displayName;
 
-    private String logoUrl;
-
-    private String hotline;
+    private LogoUrl logo;
+    private Hotline hotline;
 
     private TenantStatus status;
 
-    private OffsetDateTime updatedAt;
+    // private OffsetDateTime updatedAt;
+
+    private TenantName name;
+
+    private TenantCode code;
+
+
+    private boolean active;
 
     private Tenant(
         TenantId id,
         SiteKey siteKey,
         DomainName domainName,
         DisplayName displayName,
-        Logo logo,
+        TenantName name,
+        TenantCode code,
+        LogoUrl logo,
         Hotline hotline,
         TenantStatus status,
-        OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
-) {
-
-    this.id = Objects.requireNonNull(id);
+        Instant createdAt
+    ) {
+    super(id);
 
     this.siteKey = Objects.requireNonNull(siteKey);
-
     this.domainName = Objects.requireNonNull(domainName);
+    this.active = true;
 
-    // this.displayName = Objects.requireNonNull(displayName);
+    // Fix NPE: displayName must be initialized
+    this.displayName = Objects.requireNonNull(displayName);
 
-    // this.logoUrl = logo;
+    // Keep nullable fields consistent with persistence mapper
+    this.logo = logo;
+    this.hotline = hotline;
 
-    // this.hotline = hotline;
-
+    this.name = name;
+    this.code = code;
     this.status = Objects.requireNonNull(status);
+    }
 
-    this.createdAt = Objects.requireNonNull(createdAt);
-
-    this.updatedAt = Objects.requireNonNull(updatedAt);
-
-}
-
-        public static Tenant create(
-            SiteKey siteKey,
-            DomainName domainName,
-            DisplayName displayName
-        ) {
-
-        OffsetDateTime now = OffsetDateTime.now();
-
-        return new Tenant(
-
-                TenantId.newId(),
-
-                siteKey,
-
-                domainName,
-
-                displayName,
-
-                null,
-
-                null,
-
-                TenantStatus.ACTIVE,
-
-                now,
-
-                now
-
-        );
-
-        }
-
-        public static Tenant restore(
-
-            TenantId id,
-    
-            SiteKey siteKey,
-    
-            DomainName domainName,
-    
-            DisplayName displayName,
-    
-            Logo logo,
-    
-            Hotline hotline,
-    
-            TenantStatus status,
-    
-            OffsetDateTime createdAt,
-    
-            OffsetDateTime updatedAt
+    public static Tenant restore(
+        TenantId id,
+        SiteKey siteKey,
+        DomainName domainName,
+        DisplayName displayName,
+        TenantName name,
+        TenantCode code,
+        LogoUrl logo,
+        Hotline hotline,
+        TenantStatus status,
+        Instant createdAt,
+        Instant updatedAt
     
     ) {
     
@@ -133,22 +104,21 @@ public final class Tenant {
                 domainName,
     
                 displayName,
-    
+                
+                name,
+                code,
                 logo,
     
                 hotline,
     
                 status,
     
-                createdAt,
-    
-                updatedAt
-    
+                createdAt   
         );
     
     }
 
-    public void activate() {
+    public void activate(Instant now) {
 
         if (status == TenantStatus.ARCHIVED) {
             throw new IllegalStateException(
@@ -156,17 +126,22 @@ public final class Tenant {
             );
         }
     
-        status = TenantStatus.ACTIVE;
-    
-        touch();
+        // status = TenantStatus.ACTIVE;
+        // touch();
+        this.active = true;
+
+        markUpdated(now);
     
     }
 
-    public void deactivate() {
+    public void deactivate(Instant now) {
 
-        status = TenantStatus.INACTIVE;
+        // status = TenantStatus.INACTIVE;
 
-        touch();
+        // touch();
+        this.active = false;
+
+        markUpdated(now);
 
     }
 
@@ -184,11 +159,12 @@ public final class Tenant {
     
         status = TenantStatus.SUSPENDED;
     
-        touch();
+        markUpdated(Instant.now());
     
     }
 
-    public void archive() {
+    // clockProvider.now()
+    public void archive(Instant now) {
 
         if (status == TenantStatus.ARCHIVED) {
     
@@ -198,36 +174,37 @@ public final class Tenant {
     
         status = TenantStatus.ARCHIVED;
     
-        touch();
+        markUpdated(now);
     
     }
-    public void changeLogo(String logoUrl) {
+    public void changeLogo(LogoUrl logoUrl) {
 
-        this.logoUrl = requireText(logoUrl, "Logo");
+        // this.logo = requireText(logoUrl.toString(), "Logo");
+        this.logo = logoUrl;
 
-        touch();
-
-    }
-
-    public void changeHotline(String hotline) {
-
-        this.hotline = requireText(hotline, "Hotline");
-
-        touch();
+        markUpdated(Instant.now());
 
     }
 
-    public void changeDisplayName(String displayName) {
+    public void changeHotline(Hotline hotline) {
 
-        this.displayName = requireText(displayName, "Display name");
+        this.hotline = hotline;
 
-        touch();
+        markUpdated(Instant.now());
 
     }
 
-    public TenantId getId() {
-        return id;
+    public void changeDisplayName(DisplayName displayName) {
+
+        this.displayName = displayName;
+
+        markUpdated(Instant.now());
+
     }
+
+    // public TenantId getId() {
+    //     return id;
+    // }
 
     public SiteKey getSiteKey() {
         return siteKey;
@@ -237,15 +214,15 @@ public final class Tenant {
         return domainName;
     }
 
-    public String getDisplayName() {
+    public DisplayName getDisplayName() {
         return displayName;
     }
 
-    public String getLogoUrl() {
-        return logoUrl;
+    public LogoUrl getLogoUrl() {
+        return logo;
     }
 
-    public String getHotline() {
+    public Hotline getHotline() {
         return hotline;
     }
 
@@ -253,29 +230,84 @@ public final class Tenant {
         return status;
     }
 
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
-    }
+    // private void touch() {
+    //     updatedAt = OffsetDateTime.now();
+    // }
 
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    // private String requireText(
+    //         String value,
+    //         String field
+    // ) {
 
-    private void touch() {
-        updatedAt = OffsetDateTime.now();
-    }
+    //     if (value == null || value.isBlank()) {
+    //         throw new IllegalArgumentException(field + " cannot be blank.");
+    //     }
 
-    private String requireText(
-            String value,
-            String field
+    //     return value.trim();
+
+    // }
+
+
+    public static Tenant register(
+        TenantId id,
+        SiteKey siteKey,
+        TenantName name,
+        TenantCode code,
+
+        DomainName domainName,
+
+        DisplayName displayName,
+
+        LogoUrl logo,
+
+        Hotline hotline,
+
+        TenantStatus status,
+
+        Instant now
     ) {
 
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(field + " cannot be blank.");
-        }
+        BusinessRuleValidator.check(
+                new TenantNameMustNotBeEmptyRule(
+                        name.value()));
 
-        return value.trim();
+        BusinessRuleValidator.check(
+                new TenantCodeMustNotBeEmptyRule(
+                        code.value()));
 
+        Tenant tenant =
+                new Tenant(
+                        id,
+                    siteKey,
+                    domainName,
+                    displayName,
+                    name,
+                    code,
+                    logo,
+                    hotline,
+                    status,
+                    now);
+
+        tenant.markCreated(now);
+
+        tenant.registerEvent(
+                new TenantCreatedEvent(
+                        tenant.getId(),
+                        now));
+
+        return tenant;
+    }
+
+    public TenantName getName() {
+        return name;
+    }
+
+    public TenantCode getCode() {
+        return code;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
 }

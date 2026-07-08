@@ -75,4 +75,8 @@ public final class SiteKey implements Serializable {
         return value.hashCode();
     }
 
+    public static SiteKey of(String siteKey) {
+        return new SiteKey(siteKey);
+    }
+
 }

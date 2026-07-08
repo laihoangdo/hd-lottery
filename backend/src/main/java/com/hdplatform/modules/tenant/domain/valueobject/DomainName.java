@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.net.IDN;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -71,6 +72,10 @@ public final class DomainName implements Serializable {
     @Override
     public int hashCode() {
         return value.hashCode();
+    }
+
+    public static DomainName of(String domainName) {
+        return new DomainName(domainName);
     }
 
 }
