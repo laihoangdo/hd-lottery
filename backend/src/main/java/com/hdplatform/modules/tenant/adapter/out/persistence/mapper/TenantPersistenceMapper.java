@@ -1,7 +1,5 @@
 package com.hdplatform.modules.tenant.adapter.out.persistence.mapper;
 
-import java.net.URI;
-
 import org.springframework.stereotype.Component;
 
 import com.hdplatform.modules.tenant.adapter.out.persistence.entity.TenantEntity;

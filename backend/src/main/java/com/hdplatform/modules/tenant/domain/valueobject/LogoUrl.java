@@ -2,9 +2,7 @@ package com.hdplatform.modules.tenant.domain.valueobject;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.IDN;
 import java.net.URI;
-import java.util.Locale;
 import java.util.Objects;
 
 /**

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.net.IDN;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**

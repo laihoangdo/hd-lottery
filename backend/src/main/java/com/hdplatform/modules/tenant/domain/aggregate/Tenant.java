@@ -26,10 +26,6 @@ import java.util.Objects;
  */
 public class Tenant extends AuditableEntity<TenantId>{
 
-    // private final TenantId id;
-
-    // private final OffsetDateTime createdAt;
-
     private SiteKey siteKey;
 
     private DomainName domainName;
@@ -67,11 +63,7 @@ public class Tenant extends AuditableEntity<TenantId>{
     this.siteKey = Objects.requireNonNull(siteKey);
     this.domainName = Objects.requireNonNull(domainName);
     this.active = true;
-
-    // Fix NPE: displayName must be initialized
     this.displayName = Objects.requireNonNull(displayName);
-
-    // Keep nullable fields consistent with persistence mapper
     this.logo = logo;
     this.hotline = hotline;
 
@@ -126,21 +118,15 @@ public class Tenant extends AuditableEntity<TenantId>{
             );
         }
     
-        // status = TenantStatus.ACTIVE;
-        // touch();
-        this.active = true;
-
+        status = TenantStatus.ACTIVE;
+        // this.active = true;
         markUpdated(now);
     
     }
 
     public void deactivate(Instant now) {
-
-        // status = TenantStatus.INACTIVE;
-
-        // touch();
-        this.active = false;
-
+        status = TenantStatus.INACTIVE;
+        // this.active = false;
         markUpdated(now);
 
     }
@@ -179,8 +165,8 @@ public class Tenant extends AuditableEntity<TenantId>{
     }
     public void changeLogo(LogoUrl logoUrl) {
 
-        // this.logo = requireText(logoUrl.toString(), "Logo");
-        this.logo = logoUrl;
+        this.logo = LogoUrl.of(requireText(logoUrl.toString(), "Logo"));
+        // this.logo = logoUrl;
 
         markUpdated(Instant.now());
 
@@ -188,7 +174,7 @@ public class Tenant extends AuditableEntity<TenantId>{
 
     public void changeHotline(Hotline hotline) {
 
-        this.hotline = hotline;
+        this.hotline = Hotline.of(requireText(hotline.toString(), "Hotline"));
 
         markUpdated(Instant.now());
 
@@ -196,15 +182,11 @@ public class Tenant extends AuditableEntity<TenantId>{
 
     public void changeDisplayName(DisplayName displayName) {
 
-        this.displayName = displayName;
+        this.displayName = DisplayName.of(requireText(displayName.toString(), "DisplayName"));
 
         markUpdated(Instant.now());
 
     }
-
-    // public TenantId getId() {
-    //     return id;
-    // }
 
     public SiteKey getSiteKey() {
         return siteKey;
@@ -230,22 +212,18 @@ public class Tenant extends AuditableEntity<TenantId>{
         return status;
     }
 
-    // private void touch() {
-    //     updatedAt = OffsetDateTime.now();
-    // }
+    private String requireText(
+            String value,
+            String field
+    ) {
 
-    // private String requireText(
-    //         String value,
-    //         String field
-    // ) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(field + " cannot be blank.");
+        }
 
-    //     if (value == null || value.isBlank()) {
-    //         throw new IllegalArgumentException(field + " cannot be blank.");
-    //     }
+        return value.trim();
 
-    //     return value.trim();
-
-    // }
+    }
 
 
     public static Tenant register(
