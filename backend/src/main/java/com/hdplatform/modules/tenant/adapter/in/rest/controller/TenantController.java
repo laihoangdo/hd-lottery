@@ -5,12 +5,21 @@ import com.hdplatform.modules.tenant.adapter.in.rest.request.CreateTenantRequest
 import com.hdplatform.modules.tenant.adapter.in.rest.response.TenantResponse;
 import com.hdplatform.modules.tenant.application.usecase.CreateTenantService;
 import com.hdplatform.modules.tenant.domain.aggregate.Tenant;
-import com.hdplatform.shared.response.ApiResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+
+@Tag(
+        name = "Tenant",
+        description = "Tenant Management APIs"
+)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/admin/tenants")
@@ -20,9 +29,23 @@ public class TenantController {
 
     private final TenantRestMapper mapper;
 
+        @Operation(
+                summary = "Create tenant",
+                description = "Create a new tenant."
+        )
+        @ApiResponses({
+                @ApiResponse(
+                        responseCode = "201",
+                        description = "Created"
+                ),
+                @ApiResponse(
+                        responseCode = "409",
+                        description = "Tenant already exists"
+                )
+        })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<TenantResponse> create(
+    public com.hdplatform.shared.response.ApiResponse<TenantResponse> create(
 
             @Valid
             @RequestBody
@@ -33,7 +56,7 @@ public class TenantController {
         Tenant tenant = handler.execute(
                 mapper.toCommand(request));
 
-        return ApiResponse.success(
+        return com.hdplatform.shared.response.ApiResponse.success(
                 mapper.toResponse(tenant));
 
     }
