@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import com.hdplatform.shared.domain.exception.DomainException;
+
 /**
  * Value Object representing a unique tenant site key.
  *
@@ -35,7 +37,7 @@ public final class SiteKey implements Serializable {
         String normalized = value.trim().toLowerCase();
 
         if (!PATTERN.matcher(normalized).matches()) {
-            throw new IllegalArgumentException(
+            throw new DomainException(
                     "Invalid SiteKey. Only lowercase letters, numbers and hyphen are allowed."
             );
         }

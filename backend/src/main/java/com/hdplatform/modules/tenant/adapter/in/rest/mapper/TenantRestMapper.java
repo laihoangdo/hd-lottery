@@ -3,8 +3,10 @@ package com.hdplatform.modules.tenant.adapter.in.rest.mapper;
 import org.springframework.stereotype.Component;
 
 import com.hdplatform.modules.tenant.adapter.in.rest.request.CreateTenantRequest;
+import com.hdplatform.modules.tenant.adapter.in.rest.request.UpdateTenantRequest;
 import com.hdplatform.modules.tenant.adapter.in.rest.response.TenantResponse;
 import com.hdplatform.modules.tenant.application.command.CreateTenantCommand;
+import com.hdplatform.modules.tenant.application.command.UpdateTenantCommand;
 import com.hdplatform.modules.tenant.domain.aggregate.Tenant;
 import com.hdplatform.modules.tenant.domain.aggregate.TenantId;
 import com.hdplatform.modules.tenant.domain.valueobject.DisplayName;
@@ -47,6 +49,23 @@ public class TenantRestMapper {
         );
 
     }
+
+    public UpdateTenantCommand toUpdateCommand(
+        UpdateTenantRequest request
+) {
+
+    return new UpdateTenantCommand(
+           DisplayName.of(request.displayName()),
+           request.logoUrl() == null
+                    ? null
+                    : LogoUrl.of(request.logoUrl()),
+
+            request.hotline() == null
+                    ? null
+                    : Hotline.of(request.hotline())
+    );
+
+}
 
     public TenantResponse toResponse(
             Tenant tenant

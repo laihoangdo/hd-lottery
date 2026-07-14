@@ -12,6 +12,7 @@ import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantName;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantStatus;
 import com.hdplatform.shared.domain.AuditableEntity;
+import com.hdplatform.shared.domain.exception.DomainException;
 import com.hdplatform.shared.domain.rule.BusinessRuleValidator;
 
 import java.time.Instant;
@@ -218,7 +219,7 @@ public class Tenant extends AuditableEntity<TenantId>{
     ) {
 
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(field + " cannot be blank.");
+            throw new DomainException(field + " cannot be blank.");
         }
 
         return value.trim();

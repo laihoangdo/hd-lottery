@@ -4,6 +4,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.hdplatform.shared.domain.exception.DomainException;
+
 /**
  * Value Object representing the display name of a tenant.
  */
@@ -24,7 +26,7 @@ public final class DisplayName implements Serializable {
         String normalized = value.trim();
 
         if (normalized.length() < MIN_LENGTH || normalized.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException(
+            throw new DomainException(
                     "Display name must be between "
                             + MIN_LENGTH
                             + " and "

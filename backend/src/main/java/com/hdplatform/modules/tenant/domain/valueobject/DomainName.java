@@ -7,6 +7,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import com.hdplatform.shared.domain.exception.DomainException;
+
 /**
  * Value Object representing a domain name.
  *
@@ -33,7 +35,7 @@ public final class DomainName implements Serializable {
                 .toLowerCase(Locale.ROOT);
 
         if (!DOMAIN_PATTERN.matcher(normalized).matches()) {
-            throw new IllegalArgumentException(
+            throw new DomainException(
                     "Invalid domain name: " + value
             );
         }

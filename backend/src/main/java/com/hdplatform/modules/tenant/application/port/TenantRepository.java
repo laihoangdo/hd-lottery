@@ -4,6 +4,7 @@ import com.hdplatform.modules.tenant.domain.aggregate.Tenant;
 import com.hdplatform.modules.tenant.domain.aggregate.TenantId;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -16,5 +17,7 @@ public interface TenantRepository {
     Optional<Tenant> findByCode(TenantCode code);
 
     boolean existsByCode(TenantCode code);
+    
+    List<Tenant> findAll();
 
 }

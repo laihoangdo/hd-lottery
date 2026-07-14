@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -60,6 +61,16 @@ public class TenantPersistenceAdapter implements TenantRepository {
     public boolean existsByCode(TenantCode code) {
 
         return repository.existsByCode(code.value());
+
+    }
+
+    @Override
+    public List<Tenant> findAll() {
+
+        return repository.findAll()
+                .stream()
+                .map(mapper::toAggregate)
+                .toList();
 
     }
 }
