@@ -63,6 +63,12 @@ public class TenantEntity {
     private TenantStatus status;
 
     @Column(nullable = false)
+    private UUID verticalId;
+
+    @Column(nullable = false)
+    private UUID templateId;
+
+    @Column(nullable = false)
     private Instant createdAt;
 
     @Column(nullable = false)

@@ -19,7 +19,7 @@ public final class TenantCode extends BaseValueObject {
     }
 
     @Override
-    protected Object[] getEqualityComponents() {
+    protected Object[] equalityValues() {
         return new Object[]{value};
     }
 

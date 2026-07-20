@@ -19,6 +19,10 @@ public record TenantResponse(
 
         String status,
 
+        UUID verticalId,
+
+        UUID templateId,
+
         Instant createdAt,
 
         Instant updatedAt

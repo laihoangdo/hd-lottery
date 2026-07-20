@@ -16,6 +16,8 @@ import com.hdplatform.modules.tenant.domain.valueobject.LogoUrl;
 import com.hdplatform.modules.tenant.domain.valueobject.SiteKey;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantName;
+import com.hdplatform.modules.platformcatalog.domain.TemplateId;
+import com.hdplatform.modules.platformcatalog.domain.VerticalId;
 
 @Component
 public class TenantRestMapper {
@@ -42,6 +44,11 @@ public class TenantRestMapper {
                 request.hotline() == null
                         ? null
                         : Hotline.of(request.hotline()),
+                        VerticalId.of(request.verticalId()),
+                        TemplateId.of(request.templateId()),
+                        request.ownerEmail(),
+                        request.ownerFullName(),
+                        request.ownerInitialPassword(),
                         null,
                         null,
                         null
@@ -90,6 +97,10 @@ public class TenantRestMapper {
                         : tenant.getHotline().value(),
 
                 tenant.getStatus().name(),
+
+                tenant.getVerticalId().getValue(),
+
+                tenant.getTemplateId().getValue(),
 
                 tenant.getCreatedAt(),
 

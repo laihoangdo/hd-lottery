@@ -7,6 +7,8 @@ import com.hdplatform.modules.tenant.application.port.TenantRepository;
 import com.hdplatform.modules.tenant.domain.aggregate.Tenant;
 import com.hdplatform.modules.tenant.domain.aggregate.TenantId;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
+import com.hdplatform.modules.tenant.domain.valueobject.DomainName;
+import com.hdplatform.modules.tenant.domain.valueobject.SiteKey;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,10 +60,32 @@ public class TenantPersistenceAdapter implements TenantRepository {
     }
 
     @Override
+    public Optional<Tenant> findByDomainName(DomainName domainName) {
+        return repository.findByDomainName(domainName.value())
+                .map(mapper::toAggregate);
+    }
+
+    @Override
+    public Optional<Tenant> findBySiteKey(SiteKey siteKey) {
+        return repository.findBySiteKey(siteKey.value())
+                .map(mapper::toAggregate);
+    }
+
+    @Override
     public boolean existsByCode(TenantCode code) {
 
         return repository.existsByCode(code.value());
 
+    }
+
+    @Override
+    public boolean existsBySiteKey(SiteKey siteKey) {
+        return repository.existsBySiteKey(siteKey.value());
+    }
+
+    @Override
+    public boolean existsByDomainName(DomainName domainName) {
+        return repository.existsByDomainName(domainName.value());
     }
 
     @Override

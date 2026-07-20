@@ -12,6 +12,8 @@ import com.hdplatform.modules.tenant.domain.valueobject.LogoUrl;
 import com.hdplatform.modules.tenant.domain.valueobject.SiteKey;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
 import com.hdplatform.modules.tenant.domain.valueobject.TenantName;
+import com.hdplatform.modules.platformcatalog.domain.TemplateId;
+import com.hdplatform.modules.platformcatalog.domain.VerticalId;
 
 /**
  * Maps between Domain Aggregate and Persistence Entity.
@@ -48,6 +50,8 @@ public class TenantPersistenceMapper {
                         : aggregate.getHotline().value());
 
         entity.setStatus(aggregate.getStatus());
+        entity.setVerticalId(aggregate.getVerticalId().getValue());
+        entity.setTemplateId(aggregate.getTemplateId().getValue());
 
         entity.setCreatedAt(aggregate.getCreatedAt());
         entity.setUpdatedAt(aggregate.getUpdatedAt());
@@ -73,6 +77,8 @@ public class TenantPersistenceMapper {
             // null,
             // null,
             entity.getStatus(),
+            VerticalId.of(entity.getVerticalId()),
+            TemplateId.of(entity.getTemplateId()),
             entity.getCreatedAt(),
             entity.getUpdatedAt()
         );

@@ -1,5 +1,7 @@
 package com.hdplatform.modules.tenant.domain.aggregate;
 
+import com.hdplatform.modules.platformcatalog.domain.TemplateId;
+import com.hdplatform.modules.platformcatalog.domain.VerticalId;
 import com.hdplatform.modules.tenant.domain.event.TenantCreatedEvent;
 import com.hdplatform.modules.tenant.domain.rule.TenantCodeMustNotBeEmptyRule;
 import com.hdplatform.modules.tenant.domain.rule.TenantNameMustNotBeEmptyRule;
@@ -22,7 +24,7 @@ import java.util.Objects;
  * Aggregate Root of Tenant.
  *
  * <p>
- * A Tenant represents one lottery dealer website in HD Platform.
+ * A Tenant represents one customer website in HD Platform.
  * </p>
  */
 public class Tenant extends AuditableEntity<TenantId>{
@@ -44,6 +46,9 @@ public class Tenant extends AuditableEntity<TenantId>{
 
     private TenantCode code;
 
+    private final VerticalId verticalId;
+    private TemplateId templateId;
+
 
     private boolean active;
 
@@ -55,9 +60,11 @@ public class Tenant extends AuditableEntity<TenantId>{
         TenantName name,
         TenantCode code,
         LogoUrl logo,
-        Hotline hotline,
-        TenantStatus status,
-        Instant createdAt
+	        Hotline hotline,
+	        TenantStatus status,
+	        VerticalId verticalId,
+	        TemplateId templateId,
+	        Instant createdAt
     ) {
     super(id);
 
@@ -70,7 +77,9 @@ public class Tenant extends AuditableEntity<TenantId>{
 
     this.name = name;
     this.code = code;
-    this.status = Objects.requireNonNull(status);
+	    this.status = Objects.requireNonNull(status);
+	    this.verticalId = Objects.requireNonNull(verticalId);
+	    this.templateId = Objects.requireNonNull(templateId);
     }
 
     public static Tenant restore(
@@ -81,9 +90,11 @@ public class Tenant extends AuditableEntity<TenantId>{
         TenantName name,
         TenantCode code,
         LogoUrl logo,
-        Hotline hotline,
-        TenantStatus status,
-        Instant createdAt,
+	        Hotline hotline,
+	        TenantStatus status,
+	        VerticalId verticalId,
+	        TemplateId templateId,
+	        Instant createdAt,
         Instant updatedAt
     
     ) {
@@ -104,9 +115,13 @@ public class Tenant extends AuditableEntity<TenantId>{
     
                 hotline,
     
-                status,
-    
-                createdAt   
+	                status,
+
+	                verticalId,
+
+	                templateId,
+	    
+	                createdAt   
         );
     
     }
@@ -209,9 +224,18 @@ public class Tenant extends AuditableEntity<TenantId>{
         return hotline;
     }
 
-    public TenantStatus getStatus() {
-        return status;
-    }
+	    public TenantStatus getStatus() {
+	        return status;
+	    }
+
+	    public VerticalId getVerticalId() { return verticalId; }
+
+	    public TemplateId getTemplateId() { return templateId; }
+
+	    public void switchTemplate(TemplateId templateId, Instant now) {
+	        this.templateId = Objects.requireNonNull(templateId, "templateId cannot be null");
+	        markUpdated(Objects.requireNonNull(now, "now cannot be null"));
+	    }
 
     private String requireText(
             String value,
@@ -241,9 +265,13 @@ public class Tenant extends AuditableEntity<TenantId>{
 
         Hotline hotline,
 
-        TenantStatus status,
+	        TenantStatus status,
 
-        Instant now
+	        VerticalId verticalId,
+
+	        TemplateId templateId,
+
+	        Instant now
     ) {
 
         BusinessRuleValidator.check(
@@ -263,9 +291,11 @@ public class Tenant extends AuditableEntity<TenantId>{
                     name,
                     code,
                     logo,
-                    hotline,
-                    status,
-                    now);
+	                    hotline,
+	                    status,
+	                    verticalId,
+	                    templateId,
+	                    now);
 
         tenant.markCreated(now);
 

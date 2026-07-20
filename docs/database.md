@@ -146,8 +146,8 @@ JWT
 payload
 {
   "sub": "user-id",
-  "tenantId": "tenant-id",
-  "membershipId": "membership-id",
+  "tenant_id": "tenant-id",
+  "membership_id": "membership-id",
   "roles": [
     "TENANT_ADMIN"
   ],

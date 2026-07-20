@@ -10,6 +10,8 @@ import com.hdplatform.modules.tenant.domain.valueobject.TenantCode;
 import com.hdplatform.modules.tenant.domain.valueobject.LogoUrl;
 import com.hdplatform.modules.tenant.domain.valueobject.Hotline;
 import java.time.Instant;
+import com.hdplatform.modules.platformcatalog.domain.TemplateId;
+import com.hdplatform.modules.platformcatalog.domain.VerticalId;
 
 public record CreateTenantCommand(
         TenantId id,
@@ -20,6 +22,11 @@ public record CreateTenantCommand(
         DisplayName displayName,
         LogoUrl logo,
         Hotline hotline,
+        VerticalId verticalId,
+        TemplateId templateId,
+        String ownerEmail,
+        String ownerFullName,
+        String ownerInitialPassword,
         TenantStatus status,
         Instant createdAt,
         Instant updatedAt
